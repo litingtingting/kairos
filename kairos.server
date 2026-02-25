@@ -1,0 +1,15 @@
+[Unit]
+Description=Kairos Discord Bot
+After=network.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/home/ec2-user/kairos
+ExecStart=/home/ec2-user/kairos/kairos
+Restart=always
+RestartSec=10
+EnvironmentFile=/home/ec2-user/kairos/.env
+
+[Install]
+WantedBy=multi-user.target
