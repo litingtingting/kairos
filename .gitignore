@@ -1,2 +1,6 @@
 # 忽略环境文件，通过.env.example可重命名，直接填写即可
 .env
+
+go.mod
+
+go.sum

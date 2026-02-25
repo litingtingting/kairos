@@ -1,3 +1,4 @@
+#!/bin/sh
 # mkdir kairos && cd kairos
 go mod init kairos
 go get github.com/bwmarrin/discordgo

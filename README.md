@@ -17,4 +17,5 @@ https://discord.com/api/oauth2/authorize?client_id=[你的Client ID]&permissions
 
 # 运行init.sh
 
-# go build main.go
+# 编译
+go build -o discord-bot main.go
