@@ -19,3 +19,12 @@ https://discord.com/api/oauth2/authorize?client_id=[你的Client ID]&permissions
 
 # 编译
 go build -o discord-bot main.go
+
+# 将编译后的discord-bot 和 .env文件上传到正式服务器
+
+# sudo vim /etc/systemd/system/kairos.service
+# 将kairos.service文件中的内容复制
+
+sudo systemctl daemon-reload
+sudo systemctl enable kairos
+sudo systemctl start kairos
