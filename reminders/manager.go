@@ -5,7 +5,7 @@ import (
     "strings"
     "sync"
     "time"
-
+    "log"
     "github.com/bwmarrin/discordgo"
     "github.com/robfig/cron/v3"
 )
