@@ -7,6 +7,9 @@ import (
     "kairos/dice"
 
     "github.com/bwmarrin/discordgo"
+    "log"
+    "kairos/ai"      // 引入刚才写的 ai 包
+    "context"
 )
 
 func MessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
@@ -84,6 +87,17 @@ func MessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
         }
         result := dice.RollDice(diceInput)
         s.ChannelMessageSend(m.ChannelID, result)
+    
+    case "ai", "ask", "chat": // 新增 AI 命令
+        if len(args) == 0 {
+            s.ChannelMessageSend(m.ChannelID, "你想让我用 AI 帮你做什么？在后面加上你的问题，例如 `!ai 写一首关于大海的诗`")
+            return
+        }
+        // 将用户的所有输入合并成一个提示词
+        prompt := strings.Join(args, " ")
+        
+        // 在 goroutine 中处理，避免阻塞消息接收
+        go handleAIRequest(s, m, prompt)
 
     case "help", "帮助":
         helpMsg := `**🤖 Kairos 机器人命令列表**
@@ -92,6 +106,7 @@ func MessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 !我的提醒 - 查看当前提醒
 !取消提醒 [ID] - 取消提醒
 !骰子 [表达式] - 掷骰子，如 !骰子 2d6+3
+!ai [对话] - 跟AI聊天
 !ping - 测试机器人是否在线`
         s.ChannelMessageSend(m.ChannelID, helpMsg)
 
@@ -110,4 +125,34 @@ func casualChat(s *discordgo.Session, m *discordgo.MessageCreate) {
     case strings.Contains(content, "谢谢"):
         s.ChannelMessageSend(m.ChannelID, "不客气～有什么需要随时叫我")
     }
+}
+
+// handleAIRequest 是一个独立的函数来处理 AI 请求
+func handleAIRequest(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) {
+    // 先发送一个“正在思考”的提示，因为 AI 响应可能需要几秒钟
+    thinkingMsg, _ := s.ChannelMessageSend(m.ChannelID, "🤔 让我想想...")
+
+    // 创建一个上下文
+    ctx := context.Background()
+    
+    // 初始化 AI 客户端
+    aiClient, err := ai.NewClient(ctx)
+    if err != nil {
+        log.Printf("AI 客户端初始化失败: %v", err)
+        s.ChannelMessageEdit(m.ChannelID, thinkingMsg.ID, "抱歉，AI 大脑暂时无法连接，请检查服务器配置（GEMINI_API_KEY）。")
+        return
+    }
+    //defer aiClient.Close() // 记得关闭
+
+    // 调用 AI 获取回答
+    answer, err := aiClient.Ask(prompt)
+    if err != nil {
+        log.Printf("AI 请求失败: %v", err)
+        s.ChannelMessageEdit(m.ChannelID, thinkingMsg.ID, "抱歉，AI 思考时出了点小差错，请稍后再试。")
+        return
+    }
+
+    // 编辑之前的“思考中”消息，替换为 AI 的回答
+    // 注意：Discord 消息有长度限制（2000 字符），如果答案太长可能需要分段发送
+    s.ChannelMessageEdit(m.ChannelID, thinkingMsg.ID, "🤖 **AI 回答**:\n"+answer)
 }

@@ -28,3 +28,6 @@ go build -o discord-bot main.go
 sudo systemctl daemon-reload
 sudo systemctl enable kairos
 sudo systemctl start kairos
+
+# 申请google ai 
+https://aistudio.google.com/api-keys
