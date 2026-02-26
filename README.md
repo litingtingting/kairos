@@ -1,4 +1,4 @@
-# 这是一个接入discord的小机器人，有定时提醒，投骰子，问天气等功能，
+# 这是一个接入discord的小机器人，有定时提醒，投骰子，问天气, 接入google ai等功能，
 # This is a small bot integrated with Discord, featuring functions such as scheduled reminders, dice rolling, and weather inquiries.
 
 
